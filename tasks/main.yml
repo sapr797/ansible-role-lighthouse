@@ -1,2 +1,61 @@
 ---
+- name: Install dependencies for Lighthouse
+  apt:
+    name:
+      - nginx
+      - curl
+      - git
+    state: present
+    update_cache: yes
+
+- name: Download Lighthouse
+  get_url:
+    url: "https://github.com/VKCOM/lighthouse/releases/download/v{{ lighthouse_version }}/lighthouse-v{{ lighthouse_version }}.x86_64-unknown-linux-gnu.tar.gz"
+    dest: "/tmp/lighthouse.tar.gz"
+
+- name: Create Lighthouse directory
+  file:
+    path: /opt/lighthouse
+    state: directory
+    mode: '0755'
+
+- name: Extract Lighthouse
+  unarchive:
+    src: "/tmp/lighthouse.tar.gz"
+    dest: "/opt/lighthouse"
+    remote_src: yes
+    creates: "/opt/lighthouse/lighthouse"
+
+- name: Configure Lighthouse
+  template:
+    src: lighthouse.conf.j2
+    dest: /opt/lighthouse/lighthouse.conf
+
+- name: Create systemd service for Lighthouse
+  template:
+    src: lighthouse.service.j2
+    dest: /etc/systemd/system/lighthouse.service
+
+- name: Enable and start Lighthouse service
+  systemd:
+    name: lighthouse
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: Configure nginx for Lighthouse
+  template:
+    src: nginx-lighthouse.conf.j2
+    dest: /etc/nginx/sites-available/lighthouse
+
+- name: Enable nginx site for Lighthouse
+  file:
+    src: /etc/nginx/sites-available/lighthouse
+    dest: /etc/nginx/sites-enabled/lighthouse
+    state: link
+
+- name: Restart nginx
+  systemd:
+    name: nginx
+    state: restarted---
 # tasks file for ansible-role-lighthouse
