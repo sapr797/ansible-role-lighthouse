@@ -1,10 +1,14 @@
----
-lighthouse_version: "4.5.0"
-lighthouse_port: 8080
-clickhouse_host: "localhost"
+﻿---
+# Docker image for Lighthouse
+lighthouse_docker_image: "ghcr.io/letpeoplework/lighthouse:latest"
+
+# ClickHouse connection settings
+clickhouse_host: "clickhous"
 clickhouse_port: 8123
 clickhouse_user: "default"
 clickhouse_password: ""
 clickhouse_database: "default"
-nginx_server_name: "localhost"---
-# defaults file for ansible-role-lighthouse
+
+# Lighthouse settings
+lighthouse_port: 8080
+lighthouse_container_port: 8080
